@@ -1,0 +1,14 @@
+{
+  "name": "data-extracter",
+  "version": "0.0.0",
+  "description": "DataExtracter",
+  "main": "app.js",
+  "author": {
+    "name": "Rick",
+    "email": ""
+  },
+  "dependencies": {
+    "azure-arm-storage": "^0.13.1-preview",
+    "azure-storage": "^0.10.0"
+  }
+}

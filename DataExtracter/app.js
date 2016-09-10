@@ -1,34 +1,56 @@
 ﻿var azure = require('azure-storage');
 
-var queueSvc = azure.createQueueService('twitstream', process.env.azure_key);
+var queueSvc = azure.createQueueService('twitstream', '525tGSMvxz9I4mir3ucxqmdaUJTEjNLVNC9UIyVWYudHrU3jU2Pi7YCYLOVcoWj6YyI08DW8SGp8CrVpIrF2iQ==');
 
-var tableSvc = azure.createTableService('twitstream', process.env.azure_key);
+var tableSvc = azure.createTableService('twitstream', '525tGSMvxz9I4mir3ucxqmdaUJTEjNLVNC9UIyVWYudHrU3jU2Pi7YCYLOVcoWj6YyI08DW8SGp8CrVpIrF2iQ==');
 
 function convertJsonToTask(json, partitionKey, rowKey) {
-    var jsonResult = JSON.parse(json); 
-    
-    var entGen = azure.TableUtilities.entityGenerator;
-    var task = {
-        PartitionKey: entGen.String(partitionKey),
-        RowKey: entGen.String(rowKey),
-        description: entGen.String(json),
-        username: entGen.String(jsonResult.user.name),
-        screen_name: entGen.String(jsonResult.user.screen_name),
-        location: entGen.String(jsonResult.user.location),
-        friends_count: entGen.String(jsonResult.user.friends_count),
-        lang: entGen.String(jsonResult.user.lang),
-        profile_background_image_url: entGen.String(jsonResult.user.profile_background_image_url),
-        profileimage: entGen.String(jsonResult.user.profile_image_url),
-        tweet_text: entGen.String(jsonResult.text),
-        source: entGen.String(jsonResult.source),
-        followers: entGen.String(jsonResult.user.followers_count),
-        hashtags: entGen.String(jsonResult.entities.hashtags),
-        media_url: entGen.String(jsonResult.entities.media.media_url),
-        media_type: entGen.String(jsonResult.entities.media.type),
-        tex: entGen.String(jsonResult.text),
-		created_at: entGen.String(jsonResult.created_at)
+    var jsonResult = JSON.parse(json);
+    var task;
+	var entGen = azure.TableUtilities.entityGenerator;
+    if (jsonResult.entities.media.media_url == undefined) {
+		task = {
+			PartitionKey: entGen.String(partitionKey),
+			RowKey: entGen.String(rowKey),
+			description: entGen.String(json),
+			username: entGen.String(jsonResult.user.name),
+			screen_name: entGen.String(jsonResult.user.screen_name),
+			location: entGen.String(jsonResult.user.location),
+			frieends_count: entGen.String(jsonResult.user.friends_count),
+			lang: entGen.String(jsonResult.user.lang),
+			profile_background_image_url: entGen.String(jsonResult.user.profile_background_image_url),
+			profileimage: entGen.String(jsonResult.user.profile_image_url),
+			tweet_text: entGen.String(jsonResult.text),
+			source: entGen.String(jsonResult.source),
+			followers: entGen.String(jsonResult.user.followers_count),
+			hashtags: entGen.String(jsonResult.entities.hashtags),
+			tex: entGen.String(jsonResult.text),
+			created_at: entGen.String(jsonResult.created_at)
+		};
+    } else {
+		task = {
+			PartitionKey: entGen.String(partitionKey),
+			RowKey: entGen.String(rowKey),
+			description: entGen.String(json),
+			username: entGen.String(jsonResult.user.name),
+			screen_name: entGen.String(jsonResult.user.screen_name),
+			location: entGen.String(jsonResult.user.location),
+			frieends_count: entGen.String(jsonResult.user.friends_count),
+			lang: entGen.String(jsonResult.user.lang),
+			profile_background_image_url: entGen.String(jsonResult.user.profile_background_image_url),
+			profileimage: entGen.String(jsonResult.user.profile_image_url),
+			tweet_text: entGen.String(jsonResult.text),
+			source: entGen.String(jsonResult.source),
+			followers: entGen.String(jsonResult.user.followers_count),
+			hashtags: entGen.String(jsonResult.entities.hashtags),
+			media_url: entGen.String(jsonResult.entities.media.media_url),
+			media_type: entGen.String(jsonResult.entities.media.type),
+			tex: entGen.String(jsonResult.text),
+			created_at: entGen.String(jsonResult.created_at)
 
-    };
+		};
+    }
+   
     return task;
 };
 

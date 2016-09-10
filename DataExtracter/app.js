@@ -22,7 +22,7 @@ function convertJsonToTask(json, partitionKey, rowKey) {
         tweet_text: entGen.String(jsonResult.text),
         source: entGen.String(jsonResult.source),
         followers: entGen.String(jsonResult.user.followers_count),
-		hashtags: entGen.String(jsonResult.entities.hashtags),
+		//hashtags: entGen.String(jsonResult.entities.hashtags),
         tex: entGen.String(jsonResult.text),
 		created_at: entGen.String(jsonResult.created_at)
 
@@ -49,22 +49,37 @@ function main() {
                     tableSvc.replaceEntity('incomingstreamcontents', task, function (error, result, response) {
                         if (!error) {
                             // Entity updated
-                            queueSvc.createQueueIfNotExists("processedstreamids", function (error, result, response) {
-                                if (!error) {
-                                    var queMessage = message.messageText + "|" + task.profileimage._;
-                                    queueSvc.createMessage('processedstreamids', queMessage , function (error, result, response) {
-                                        if (!error) {
-            
-                                        }
-                                    });
-                                }
-                            });
-                            
-                            queueSvc.deleteMessage('incomingstreamids', message.messageId, message.popReceipt, function (error, response) {
-                                if (!error) {
-                                    main();
-                                }
-                            });
+                            queueSvc.createQueueIfNotExists("processedstreamids",
+                                function(error, result, response) {
+                                    if (!error) {
+                                        var queMessage = message.messageText + "|" + task.profileimage._;
+                                        queueSvc.createMessage('processedstreamids',
+                                            queMessage,
+                                            function(error, result, response) {
+                                                if (!error) {
+
+                                                }
+                                            });
+                                    }
+                                });
+
+                            queueSvc.deleteMessage('incomingstreamids',
+                                message.messageId,
+                                message.popReceipt,
+                                function(error, response) {
+                                    if (!error) {
+                                        main();
+                                    }
+                                });
+                        } else {
+							queueSvc.deleteMessage('incomingstreamids',
+                                message.messageId,
+                                message.popReceipt,
+                                function (error, response) {
+								if (!error) {
+									main();
+								}
+							});
                         }
                     });
                 });

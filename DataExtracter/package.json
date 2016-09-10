@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "azure-arm-storage": "^0.13.1-preview",
-    "azure-storage": "^0.10.0"
+    "azure-storage": "^0.10.0",
+    "q": "^1.4.1"
   }
 }

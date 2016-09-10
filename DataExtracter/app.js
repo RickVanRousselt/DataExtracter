@@ -5,7 +5,7 @@ var queueSvc = azure.createQueueService('twitstream', '525tGSMvxz9I4mir3ucxqmdaU
 var tableSvc = azure.createTableService('twitstream', '525tGSMvxz9I4mir3ucxqmdaUJTEjNLVNC9UIyVWYudHrU3jU2Pi7YCYLOVcoWj6YyI08DW8SGp8CrVpIrF2iQ==');
 
 function convertJsonToTask(json, partitionKey, rowKey) {
-    var jsonResult = JSON.parse(json); 
+    var jsonResult = JSON.parse(json);  
     
     var entGen = azure.TableUtilities.entityGenerator;
     var task = {

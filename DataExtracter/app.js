@@ -1,13 +1,13 @@
-﻿var azure = require('azure-storage');
+﻿var Azure = require("azure-storage");
 
-var queueSvc = azure.createQueueService('twitstream', '525tGSMvxz9I4mir3ucxqmdaUJTEjNLVNC9UIyVWYudHrU3jU2Pi7YCYLOVcoWj6YyI08DW8SGp8CrVpIrF2iQ==');
+var QueueSvc = Azure.createQueueService(process.env.table_name, process.env.azure_key);
 
-var tableSvc = azure.createTableService('twitstream', '525tGSMvxz9I4mir3ucxqmdaUJTEjNLVNC9UIyVWYudHrU3jU2Pi7YCYLOVcoWj6YyI08DW8SGp8CrVpIrF2iQ==');
+var TableSvc = Azure.createTableService(process.env.table_name, process.env.azure_key);
 
-function convertJsonToTask(json, partitionKey, rowKey) {
+function ConvertJsonToTask(json, partitionKey, rowKey) {
     var jsonResult = JSON.parse(json);  
     
-    var entGen = azure.TableUtilities.entityGenerator;
+    var entGen = Azure.TableUtilities.entityGenerator;
     var task = {
         PartitionKey: entGen.String(partitionKey),
         RowKey: entGen.String(rowKey),
@@ -30,30 +30,30 @@ function convertJsonToTask(json, partitionKey, rowKey) {
     return task;
 };
 
-function main() {
+function Main() {
         
-    queueSvc.getMessages('incomingstreamids', function (error, result, response) {
+    QueueSvc.getMessages('incomingstreamids', function (error, result, response) {
         if (!error) {
             // Message text is in messages[0].messageText
             var message = result[0];
             if (message != null) {
-                var queryArray = message.messageText.split(';')
+                var queryArray = message.messageText.split(';');
                 
-                tableSvc.retrieveEntity('incomingstreamcontents', queryArray[0], queryArray[1], function (error, result, response) {
+                TableSvc.retrieveEntity('incomingstreamcontents', queryArray[0], queryArray[1], function (error, result, response) {
                     if (!error) {
                     // query was successful
                     }
 					
-                    var task = convertJsonToTask(result.description._, result.PartitionKey._, result.RowKey._);
+                    var task = ConvertJsonToTask(result.description._, result.PartitionKey._, result.RowKey._);
                     
-                    tableSvc.replaceEntity('incomingstreamcontents', task, function (error, result, response) {
+                    TableSvc.replaceEntity('incomingstreamcontents', task, function (error, result, response) {
                         if (!error) {
                             // Entity updated
-                            queueSvc.createQueueIfNotExists("processedstreamids",
+                            QueueSvc.createQueueIfNotExists("processedstreamids",
                                 function(error, result, response) {
                                     if (!error) {
                                         var queMessage = message.messageText + "|" + task.profileimage._;
-                                        queueSvc.createMessage('processedstreamids',
+                                        QueueSvc.createMessage('processedstreamids',
                                             queMessage,
                                             function(error, result, response) {
                                                 if (!error) {
@@ -63,21 +63,21 @@ function main() {
                                     }
                                 });
 
-                            queueSvc.deleteMessage('incomingstreamids',
+                            QueueSvc.deleteMessage('incomingstreamids',
                                 message.messageId,
                                 message.popReceipt,
                                 function(error, response) {
                                     if (!error) {
-                                        main();
+                                        Main();
                                     }
                                 });
                         } else {
-							queueSvc.deleteMessage('incomingstreamids',
+							QueueSvc.deleteMessage('incomingstreamids',
                                 message.messageId,
                                 message.popReceipt,
                                 function (error, response) {
 								if (!error) {
-									main();
+									Main();
 								}
 							});
                         }
@@ -88,13 +88,13 @@ function main() {
     });
 };
 
-function starter()
+function Starter()
 {
-    main();
+    Main();
     //while (true) {
     //    setTimeout(main, 10000);
     //}
 };
 
-starter();
+Starter();
 

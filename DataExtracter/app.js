@@ -3,7 +3,7 @@
 var QueueSvc = Azure.createQueueService(process.env.table_name, process.env.azure_key);
 
 var TableSvc = Azure.createTableService(process.env.table_name, process.env.azure_key);
-
+ 
 function ConvertJsonToTask(json, partitionKey, rowKey) {
     var jsonResult = JSON.parse(json);  
     
